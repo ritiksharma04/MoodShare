@@ -1,0 +1,122 @@
+2023-06-21 16:37:57,157 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 16:38:06,507 ERROR: Exception on /index [GET] [in C:\Naina\microblog\venv\lib\site-packages\flask\app.py:1744]
+Traceback (most recent call last):
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\app.py", line 2528, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Naina\microblog\venv\lib\site-packages\flask_login\utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "C:\Naina\microblog\app\routes.py", line 31, in index
+    return render_template('index.html', title='Home', form=form,
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\templating.py", line 147, in render_template
+    return _render(app, template, context)
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\templating.py", line 130, in _render
+    rv = template.render(context)
+  File "C:\Naina\microblog\venv\lib\site-packages\jinja2\environment.py", line 1301, in render
+    self.environment.handle_exception()
+  File "C:\Naina\microblog\venv\lib\site-packages\jinja2\environment.py", line 936, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Naina\microblog\app\templates\index.html", line 2, in top-level template code
+    {% import 'bootstrap/wtf.html' as wtf %}
+  File "C:\Naina\microblog\app\templates\base.html", line 1, in top-level template code
+    {% extends 'bootstrap/base.html' %}
+  File "C:\Naina\microblog\venv\lib\site-packages\flask_bootstrap\templates\bootstrap\base.html", line 1, in top-level template code
+    {% block doc -%}
+  File "C:\Naina\microblog\venv\lib\site-packages\flask_bootstrap\templates\bootstrap\base.html", line 4, in block 'doc'
+    {%- block html %}
+  File "C:\Naina\microblog\venv\lib\site-packages\flask_bootstrap\templates\bootstrap\base.html", line 20, in block 'html'
+    {% block body -%}
+  File "C:\Naina\microblog\venv\lib\site-packages\flask_bootstrap\templates\bootstrap\base.html", line 21, in block 'body'
+    {% block navbar %}
+  File "C:\Naina\microblog\app\templates\base.html", line 17, in block 'navbar'
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">Microblog</a>
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\app.py", line 2034, in url_for
+    return self.handle_url_build_error(error, endpoint, values)
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\app.py", line 2023, in url_for
+    rv = url_adapter.build(  # type: ignore[union-attr]
+  File "C:\Naina\microblog\venv\lib\site-packages\werkzeug\routing\map.py", line 917, in build
+    raise BuildError(endpoint, values, method, self)
+werkzeug.routing.exceptions.BuildError: Could not build url for endpoint 'main.index'. Did you mean 'index' instead?
+2023-06-21 16:49:52,957 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 16:51:40,724 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 17:14:31,310 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 20:22:25,396 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 20:25:24,551 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 20:34:28,578 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 20:35:36,312 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 20:42:53,462 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 20:51:18,852 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 20:54:03,218 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 21:05:44,198 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 21:11:59,252 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 21:12:06,897 ERROR: Exception on / [GET] [in C:\Naina\microblog\venv\lib\site-packages\flask\app.py:1744]
+Traceback (most recent call last):
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\app.py", line 2528, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Naina\microblog\venv\lib\site-packages\flask_login\utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "C:\Naina\microblog\app\routes.py", line 31, in index
+    return render_template('index.html', title='Home', form=form,
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\templating.py", line 147, in render_template
+    return _render(app, template, context)
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\templating.py", line 130, in _render
+    rv = template.render(context)
+  File "C:\Naina\microblog\venv\lib\site-packages\jinja2\environment.py", line 1301, in render
+    self.environment.handle_exception()
+  File "C:\Naina\microblog\venv\lib\site-packages\jinja2\environment.py", line 936, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Naina\microblog\app\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Naina\microblog\venv\lib\site-packages\jinja2\environment.py", line 936, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Naina\microblog\app\templates\base.html", line 17, in template
+    {% load static %}
+jinja2.exceptions.TemplateSyntaxError: Encountered unknown tag 'load'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
+2023-06-21 21:12:09,979 ERROR: Exception on / [GET] [in C:\Naina\microblog\venv\lib\site-packages\flask\app.py:1744]
+Traceback (most recent call last):
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\app.py", line 2528, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\app.py", line 1825, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\app.py", line 1823, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\app.py", line 1799, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "C:\Naina\microblog\venv\lib\site-packages\flask_login\utils.py", line 290, in decorated_view
+    return current_app.ensure_sync(func)(*args, **kwargs)
+  File "C:\Naina\microblog\app\routes.py", line 31, in index
+    return render_template('index.html', title='Home', form=form,
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\templating.py", line 147, in render_template
+    return _render(app, template, context)
+  File "C:\Naina\microblog\venv\lib\site-packages\flask\templating.py", line 130, in _render
+    rv = template.render(context)
+  File "C:\Naina\microblog\venv\lib\site-packages\jinja2\environment.py", line 1301, in render
+    self.environment.handle_exception()
+  File "C:\Naina\microblog\venv\lib\site-packages\jinja2\environment.py", line 936, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Naina\microblog\app\templates\index.html", line 1, in top-level template code
+    {% extends "base.html" %}
+  File "C:\Naina\microblog\venv\lib\site-packages\jinja2\environment.py", line 936, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "C:\Naina\microblog\app\templates\base.html", line 17, in template
+    {% load static %}
+jinja2.exceptions.TemplateSyntaxError: Encountered unknown tag 'load'. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
+2023-06-21 21:20:33,206 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 21:27:51,163 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 21:28:52,899 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 22:16:53,676 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 22:18:05,580 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 22:18:58,014 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 22:19:35,650 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
+2023-06-21 22:21:24,996 INFO: Microblog startup [in C:\Naina\microblog\app\__init__.py:49]
