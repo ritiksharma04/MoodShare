@@ -33,6 +33,9 @@ through short, Twitter-like mini blogs.
 - **Following**: Users can follow other users to receive updates from their activities, such as their posts, comments, or other interactions.
 - **Last Seen Status**: Users can check the last seen status of other users, indicating when they were last active on the platform.
 
+### User home tab
+- **Browse different share mini blogs**: Users have the ability to browse all the users mini blogs.
+- **Change Home feed**: Users can follow other users that matches their interests and vibe.
 
 ## Technologies
 
@@ -70,10 +73,12 @@ To get started with the project, follow these steps:
  ## Pictures
  
  ### Home Page
- ![home tab](https://github.com/ritiksharma04/MoodShare/blob/master/project%20SS/4Home_page.png)
+ ![home tab](https://i.imgur.com/quUQY2V.png)
 
  ### Explore tab
- ![Explore tab](https://github.com/ritiksharma04/MoodShare/blob/master/project%20SS/7Explore_tab.png)
- 
+ ![Explore tab](https://i.imgur.com/bBN0O6b.png)
+
+ ### User Profile
+ ![profile](https://i.imgur.com/yKfcLFJ.png)
 
 Thank you for visiting my project repository! I hope you find it informative and relevant to my skills and expertise.
