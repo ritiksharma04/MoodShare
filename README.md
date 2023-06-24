@@ -7,7 +7,7 @@ The project aims to create a social networking web app for users to share their 
 
 ## Table of Contents
 
-- [Description](#Description)
+- [Description](#description)
 - [Features](#features)
 - [Technologies](#technologies)
 - [Installation](#installation)
@@ -65,7 +65,7 @@ To get started with the project, follow these steps:
 
      ```bash
      venv\Scripts\activate
-     ``
+     ```
 
  ## Pictures
  
