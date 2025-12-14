@@ -1,52 +1,149 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{#
+    USER PROFILE PAGE
+    =================
 
-{% block app_content %}
-    <table class="table table-hover">
-        <tr>
-            <td width="256px"><img src="{{ user.avatar(256) }}"></td>
-            <td>
-        <h1>User: {{ user.username }}</h1>
-        {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
-                {% if user.last_seen %}
-                <p>Last seen on: {{ moment(user.last_seen).format('LLL') }}</p>
+    Shows a user's profile with:
+    - Avatar, username, bio
+    - Follower/following counts
+    - Follow/unfollow button (if viewing someone else's profile)
+    - Edit profile link (if viewing own profile)
+    - User's posts
+
+    AUTHORIZATION CONCEPT:
+    ----------------------
+    Notice the {% if user == current_user %} checks.
+    This is AUTHORIZATION - determining what actions a user can perform.
+
+    - Authentication = Who are you? (login)
+    - Authorization = What can you do? (permissions)
+
+    Here, we show different buttons based on:
+    1. Is this my profile? -> Show "Edit profile"
+    2. Am I following them? -> Show "Unfollow"
+    3. Am I not following them? -> Show "Follow"
+#}
+
+{% block content %}
+{# Profile header card #}
+<div class="bg-white dark:bg-[#252525] rounded-xl border border-gray-200 dark:border-gray-800 p-6 mb-6">
+    <div class="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+        {# Avatar #}
+        <img src="{{ user.avatar(128) }}"
+             alt="{{ user.username }}'s avatar"
+             class="w-32 h-32 rounded-full">
+
+        {# Profile info #}
+        <div class="flex-1 text-center sm:text-left">
+            <h1 class="text-2xl font-bold text-warm-black dark:text-white mb-2">
+                {{ user.username }}
+            </h1>
+
+            {# Bio #}
+            {% if user.about_me %}
+                <p class="text-gray-600 dark:text-gray-400 mb-4">{{ user.about_me }}</p>
+            {% endif %}
+
+            {# Stats #}
+            <div class="flex justify-center sm:justify-start gap-6 mb-4">
+                <div>
+                    <span class="font-semibold text-warm-black dark:text-white">{{ user.followers.count() }}</span>
+                    <span class="text-gray-500 dark:text-gray-500 ml-1">followers</span>
+                </div>
+                <div>
+                    <span class="font-semibold text-warm-black dark:text-white">{{ user.followed.count() }}</span>
+                    <span class="text-gray-500 dark:text-gray-500 ml-1">following</span>
+                </div>
+            </div>
+
+            {# Last seen #}
+            {% if user.last_seen %}
+                <p class="text-sm text-gray-500 dark:text-gray-500 mb-4">
+                    Last seen {{ moment(user.last_seen).fromNow() }}
+                </p>
+            {% endif %}
+
+            {# Action buttons #}
+            <div class="flex justify-center sm:justify-start gap-3">
+                {% if user == current_user %}
+                    {# Edit own profile #}
+                    <a href="{{ url_for('edit_profile') }}"
+                       class="px-4 py-2 bg-warm-black dark:bg-white text-white dark:text-warm-black font-medium rounded-lg hover:opacity-90 transition-opacity">
+                        Edit Profile
+                    </a>
+                {% elif not current_user.is_following(user) %}
+                    {# Follow button #}
+                    <form action="{{ url_for('follow', username=user.username) }}" method="POST">
+                        {{ form.hidden_tag() }}
+                        <button type="submit"
+                                class="px-4 py-2 bg-warm-black dark:bg-white text-white dark:text-warm-black font-medium rounded-lg hover:opacity-90 transition-opacity">
+                            Follow
+                        </button>
+                    </form>
+                {% else %}
+                    {# Unfollow button #}
+                    <form action="{{ url_for('unfollow', username=user.username) }}" method="POST">
+                        {{ form.hidden_tag() }}
+                        <button type="submit"
+                                class="px-4 py-2 bg-white dark:bg-[#252525] text-warm-black dark:text-white font-medium rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors">
+                            Unfollow
+                        </button>
+                    </form>
                 {% endif %}
-        <p>{{ user.followers.count() }} followers, {{ user.followed.count() }} following.</p>
-        {% if user == current_user %}
-        <p><a href="{{ url_for('edit_profile') }}">Edit your profile</a></p>
-        {% elif not current_user.is_following(user) %}
-        <p>
-            <form action="{{ url_for('follow', username=user.username) }}" method="post">
-                {{ form.hidden_tag() }}
-                {{ form.submit(value='Follow', class_='btn btn-default') }}
-            </form>
-        </p>
-        {% else %}
-        <p>
-            <form action="{{ url_for('unfollow', username=user.username) }}" method="post">
-                {{ form.hidden_tag() }}
-                {{ form.submit(value='Unfollow') }}
-            </form>
-        </p>
-        {% endif %}
-            </td>
-        </tr>
-    </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-    {% for post in posts %}
-        {% include '_post.html' %}
-    {% endfor %}
-    <nav aria-label="...">
-        <ul class="pager">
-            <li class="previous{% if not prev_url %} disabled{% endif %}">
-                <a href="{{ prev_url or '#' }}">
-                    <span aria-hidden="true">&larr;</span> Newer posts
-                </a>
-            </li>
-            <li class="next{% if not next_url %} disabled{% endif %}">
-                <a href="{{ next_url or '#' }}">
-                    Older posts <span aria-hidden="true">&rarr;</span>
-                </a>
-            </li>
-        </ul>
-    </nav>
+{# User's posts #}
+<div class="bg-white dark:bg-[#252525] rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+    <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+        <h2 class="font-semibold text-warm-black dark:text-white">Posts</h2>
+    </div>
+
+    {% if posts %}
+        {% for post in posts %}
+            {% include '_post.html' %}
+        {% endfor %}
+    {% else %}
+        <div class="p-8 text-center">
+            <p class="text-gray-500 dark:text-gray-400">
+                {% if user == current_user %}
+                    You haven't posted anything yet.
+                {% else %}
+                    {{ user.username }} hasn't posted anything yet.
+                {% endif %}
+            </p>
+        </div>
+    {% endif %}
+</div>
+
+{# Pagination #}
+{% if prev_url or next_url %}
+<div class="flex justify-between items-center mt-6">
+    {% if prev_url %}
+        <a href="{{ prev_url }}"
+           class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-[#252525] border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Newer
+        </a>
+    {% else %}
+        <div></div>
+    {% endif %}
+
+    {% if next_url %}
+        <a href="{{ next_url }}"
+           class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-[#252525] border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors">
+            Older
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </a>
+    {% else %}
+        <div></div>
+    {% endif %}
+</div>
+{% endif %}
 {% endblock %}

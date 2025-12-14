@@ -1,15 +1,108 @@
 {% extends 'base.html' %}
-{% import 'bootstrap/wtf.html' as wtf %}
+{#
+    LOGIN PAGE
+    ==========
 
-{% block app_content %}
-    <h1>Sign In</h1>
-    <div class="row">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form) }}
+    FLASK-WTF FORM RENDERING EXPLAINED:
+    -----------------------------------
+    Instead of wtf.quick_form(), we manually render each field.
+    This gives us full control over styling.
+
+    form.username = The actual input element
+    form.username.label = The label text
+    form.username.errors = List of validation error messages
+    form.hidden_tag() = CSRF protection token (IMPORTANT!)
+
+    CSRF (Cross-Site Request Forgery) Protection:
+    - hidden_tag() generates a secret token
+    - Server checks this token on form submit
+    - Prevents malicious sites from submitting forms on your behalf
+#}
+
+{% block content %}
+<div class="min-h-[60vh] flex items-center justify-center">
+    <div class="w-full max-w-sm">
+        {# Card container #}
+        <div class="bg-white dark:bg-[#252525] rounded-xl border border-gray-200 dark:border-gray-800 p-8 shadow-sm">
+            {# Header #}
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-warm-black dark:text-white mb-2">Welcome back</h1>
+                <p class="text-gray-500 dark:text-gray-400">Sign in to your account</p>
+            </div>
+
+            {# Form #}
+            <form method="POST" action="" class="space-y-5">
+                {#
+                    CSRF TOKEN - Never forget this!
+                    This is what makes your forms secure.
+                    Without it, form submissions will be rejected.
+                #}
+                {{ form.hidden_tag() }}
+
+                {# Username field #}
+                <div>
+                    <label for="username" class="block text-sm font-medium text-warm-black dark:text-gray-200 mb-2">
+                        Username
+                    </label>
+                    {#
+                        Rendering the input with custom classes:
+                        - We pass class_ (with underscore) because 'class' is a Python keyword
+                        - This adds Tailwind classes to the generated <input>
+                    #}
+                    {{ form.username(
+                        class_="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-[#191919] border border-gray-200 dark:border-gray-700 text-warm-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all",
+                        placeholder="Enter your username"
+                    ) }}
+                    {# Display validation errors #}
+                    {% if form.username.errors %}
+                        {% for error in form.username.errors %}
+                            <p class="mt-1 text-sm text-red-500">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                {# Password field #}
+                <div>
+                    <label for="password" class="block text-sm font-medium text-warm-black dark:text-gray-200 mb-2">
+                        Password
+                    </label>
+                    {{ form.password(
+                        class_="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-[#191919] border border-gray-200 dark:border-gray-700 text-warm-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all",
+                        placeholder="Enter your password"
+                    ) }}
+                    {% if form.password.errors %}
+                        {% for error in form.password.errors %}
+                            <p class="mt-1 text-sm text-red-500">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                {# Remember me checkbox #}
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        {{ form.remember_me(class_="w-4 h-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500") }}
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Remember me</span>
+                    </label>
+                    <a href="{{ url_for('reset_password_request') }}" class="text-sm text-blue-500 hover:text-blue-600 transition-colors">
+                        Forgot password?
+                    </a>
+                </div>
+
+                {# Submit button #}
+                <button type="submit"
+                        class="w-full py-3 px-4 bg-warm-black dark:bg-white text-white dark:text-warm-black font-medium rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 dark:focus:ring-white transition-all">
+                    Sign In
+                </button>
+            </form>
+
+            {# Register link #}
+            <p class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                Don't have an account?
+                <a href="{{ url_for('register') }}" class="text-blue-500 hover:text-blue-600 font-medium transition-colors">
+                    Create one
+                </a>
+            </p>
         </div>
     </div>
-    <br>
-            <p>New User? <a href="{{ url_for('register') }}">Click to Register!</a></p>
-            <p> Forgot Your Password? <a href="{{ url_for('reset_password_request') }}">Click to Reset It</a> </p>
-
+</div>
 {% endblock %}

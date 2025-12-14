@@ -6,8 +6,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_mail import Mail
-from flask_bootstrap import Bootstrap
+# Note: Removed Flask-Bootstrap - now using Tailwind CSS directly in templates
 from flask_moment import Moment
+from flask_wtf.csrf import CSRFProtect
 from config import Config
 
 app = Flask(__name__)
@@ -17,8 +18,16 @@ migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'login'
 mail = Mail(app)
-bootstrap = Bootstrap(app)
+# bootstrap removed - using Tailwind CSS now
 moment = Moment(app)
+# CSRF protection - makes csrf_token() available in all templates
+csrf = CSRFProtect(app)
+
+# Make csrf_token available in all templates via context processor
+@app.context_processor
+def inject_csrf_token():
+    from flask_wtf.csrf import generate_csrf
+    return dict(csrf_token=generate_csrf)
 
 if not app.debug:
     if app.config['MAIL_SERVER']:
@@ -49,3 +58,10 @@ if not app.debug:
     app.logger.info('Microblog startup')
 
 from app import routes, models, errors
+
+# Register API blueprint
+from app.api import api as api_blueprint
+app.register_blueprint(api_blueprint)
+
+# Exempt API routes from CSRF (they use token authentication)
+csrf.exempt(api_blueprint)

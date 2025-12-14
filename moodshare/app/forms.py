@@ -61,3 +61,38 @@ class PostForm(FlaskForm):
     post = TextAreaField('Say something', validators=[
         DataRequired(), Length(min=1, max=140)])
     submit = SubmitField('Submit')
+
+
+# =============================================================================
+# SEARCH FORM
+# =============================================================================
+#
+# SEARCH UX PATTERNS:
+# -------------------
+# 1. GET vs POST for search:
+#    - We use GET because search results should be bookmarkable/shareable
+#    - URL looks like: /search?q=hello
+#    - Users can share search result links
+#
+# 2. The 'q' parameter:
+#    - Standard convention for search query parameter
+#    - Google uses it: google.com/search?q=hello
+#    - We follow the same pattern
+#
+# FORM METHODS:
+# - method="get" -> Form data goes in URL (?q=value)
+# - method="post" -> Form data goes in request body (hidden)
+# =============================================================================
+
+class SearchForm(FlaskForm):
+    """Search form for finding users and posts."""
+    q = StringField('Search', validators=[DataRequired()])
+
+    def __init__(self, *args, **kwargs):
+        # Use GET method by default (for bookmarkable URLs)
+        if 'formdata' not in kwargs:
+            kwargs['formdata'] = request.args
+        # Disable CSRF for GET forms (not needed for read-only operations)
+        if 'meta' not in kwargs:
+            kwargs['meta'] = {'csrf': False}
+        super(SearchForm, self).__init__(*args, **kwargs)

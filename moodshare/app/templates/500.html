@@ -1,7 +1,36 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{#
+    500 ERROR PAGE
+    ==============
 
-{% block app_content %}
-    <h1>An unexpected error has occurred</h1>
-    <p>The administrator has been notified. Sorry for the inconvenience!</p>
-    <p><a href="{{ url_for('index') }}">Back</a></p>
+    This page is shown when something goes wrong on the server.
+    Common causes:
+    - Database connection failed
+    - Unhandled exception in code
+    - Configuration errors
+
+    The error details are logged (see __init__.py logging setup)
+    but NOT shown to users for security.
+#}
+
+{% block content %}
+<div class="min-h-[60vh] flex items-center justify-center">
+    <div class="text-center">
+        {# Big 500 number #}
+        <h1 class="text-8xl font-bold text-gray-200 dark:text-gray-800 mb-4">500</h1>
+
+        <h2 class="text-2xl font-bold text-warm-black dark:text-white mb-2">Something Went Wrong</h2>
+        <p class="text-gray-500 dark:text-gray-400 mb-8 max-w-md">
+            An unexpected error occurred. The administrator has been notified.
+        </p>
+
+        <a href="{{ url_for('index') }}"
+           class="inline-flex items-center gap-2 px-6 py-3 bg-warm-black dark:bg-white text-white dark:text-warm-black font-medium rounded-lg hover:opacity-90 transition-opacity">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Go Home
+        </a>
+    </div>
+</div>
 {% endblock %}

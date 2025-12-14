@@ -1,6 +1,35 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{#
+    404 ERROR PAGE
+    ==============
 
-{% block app_content %}
-    <h1>File Not Found</h1>
-    <p><a href="{{ url_for('index') }}">Back</a></p>
+    HTTP Status Codes Explained:
+    - 200 = OK (success)
+    - 404 = Not Found (page doesn't exist)
+    - 500 = Internal Server Error (server crashed)
+
+    This page is rendered when a user visits a URL that doesn't exist.
+    Defined in errors.py as an error handler.
+#}
+
+{% block content %}
+<div class="min-h-[60vh] flex items-center justify-center">
+    <div class="text-center">
+        {# Big 404 number #}
+        <h1 class="text-8xl font-bold text-gray-200 dark:text-gray-800 mb-4">404</h1>
+
+        <h2 class="text-2xl font-bold text-warm-black dark:text-white mb-2">Page Not Found</h2>
+        <p class="text-gray-500 dark:text-gray-400 mb-8 max-w-md">
+            The page you're looking for doesn't exist or has been moved.
+        </p>
+
+        <a href="{{ url_for('index') }}"
+           class="inline-flex items-center gap-2 px-6 py-3 bg-warm-black dark:bg-white text-white dark:text-warm-black font-medium rounded-lg hover:opacity-90 transition-opacity">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Go Home
+        </a>
+    </div>
+</div>
 {% endblock %}

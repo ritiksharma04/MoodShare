@@ -2,9 +2,9 @@ from flask import render_template, flash, redirect, url_for, request
 from app import app
 from app import db
 from app.forms import (LoginForm, RegistrationForm, EditProfileForm, EmptyForm,
-                       PostForm, ResetPasswordRequestForm, ResetPasswordForm)
+                       PostForm, ResetPasswordRequestForm, ResetPasswordForm, SearchForm)
 # login
-from werkzeug.urls import url_parse
+from urllib.parse import urlparse
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Post
 from datetime import datetime
@@ -45,7 +45,7 @@ def login():
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
-        if not next_page or url_parse(next_page).netloc != '':
+        if not next_page or urlparse(next_page).netloc != '':
             next_page = url_for('index')
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
@@ -195,3 +195,145 @@ def explore():
         if posts.has_prev else None
     return render_template("index.html", title='Explore', posts=posts.items,
                            next_url=next_url, prev_url=prev_url)
+
+
+# =============================================================================
+# LIKE/UNLIKE ROUTES
+# =============================================================================
+#
+# HTTP METHODS EXPLAINED:
+# -----------------------
+# - GET: Retrieve data (viewing pages)
+# - POST: Submit data (forms, actions like like/unlike)
+# - DELETE: Remove data (we'll use POST for compatibility)
+#
+# WHY POST and not GET for likes?
+# - GET requests should be "safe" (no side effects)
+# - Liking a post CHANGES data, so we use POST
+# - Also prevents accidental likes from link prefetching
+#
+# THE 'referrer' PARAMETER:
+# - After liking, we redirect back to where the user was
+# - request.referrer gives us the previous page URL
+# - This creates a smooth UX (user stays on same page)
+# =============================================================================
+
+@app.route('/like/<int:post_id>', methods=['POST'])
+@login_required
+def like_post(post_id):
+    """Like a post. Redirects back to the referring page."""
+    post = Post.query.get_or_404(post_id)
+    post.like(current_user)
+    db.session.commit()
+
+    # Redirect back to where the user came from
+    return redirect(request.referrer or url_for('index'))
+
+
+@app.route('/unlike/<int:post_id>', methods=['POST'])
+@login_required
+def unlike_post(post_id):
+    """Unlike a post. Redirects back to the referring page."""
+    post = Post.query.get_or_404(post_id)
+    post.unlike(current_user)
+    db.session.commit()
+
+    # Redirect back to where the user came from
+    return redirect(request.referrer or url_for('index'))
+
+
+# =============================================================================
+# DELETE POST ROUTE
+# =============================================================================
+#
+# AUTHORIZATION EXPLAINED:
+# ------------------------
+# Authentication = "Who are you?" (handled by @login_required)
+# Authorization = "What can you do?" (checked with post.author == current_user)
+#
+# A user should ONLY be able to delete their OWN posts.
+# If someone tries to delete another user's post, we reject with 403 Forbidden.
+#
+# HTTP STATUS CODES:
+# - 200 = OK
+# - 403 = Forbidden (authenticated but not authorized)
+# - 404 = Not Found
+# =============================================================================
+
+@app.route('/delete/<int:post_id>', methods=['POST'])
+@login_required
+def delete_post(post_id):
+    """Delete a post. Only the author can delete their own posts."""
+    post = Post.query.get_or_404(post_id)
+
+    # AUTHORIZATION CHECK: Only author can delete
+    if post.author != current_user:
+        flash('You can only delete your own posts!')
+        return redirect(url_for('index'))
+
+    db.session.delete(post)
+    db.session.commit()
+    flash('Post deleted.')
+
+    return redirect(request.referrer or url_for('index'))
+
+
+# =============================================================================
+# SEARCH ROUTE
+# =============================================================================
+#
+# SQL LIKE QUERIES EXPLAINED:
+# ---------------------------
+# The LIKE operator in SQL allows pattern matching:
+# - % = matches any sequence of characters
+# - _ = matches exactly one character
+#
+# Examples:
+# - LIKE '%hello%' matches 'say hello world', 'hello', 'helloooo'
+# - LIKE 'hello%' matches 'hello world' but not 'say hello'
+#
+# In SQLAlchemy, we use .ilike() for case-insensitive matching.
+#
+# QUERY PARAMETERS EXPLAINED:
+# ---------------------------
+# request.args contains URL query parameters
+# For URL /search?q=hello&page=2:
+# - request.args.get('q') returns 'hello'
+# - request.args.get('page', 1, type=int) returns 2 (as integer)
+# =============================================================================
+
+@app.route('/search')
+@login_required
+def search():
+    """Search for users and posts."""
+    form = SearchForm()
+
+    # If no search query, show empty search page
+    if not form.validate():
+        return render_template('search.html', title='Search', form=form,
+                             users=[], posts=[])
+
+    # Get the search query
+    query = form.q.data
+    page = request.args.get('page', 1, type=int)
+
+    # Search for users (case-insensitive username match)
+    users = User.query.filter(
+        User.username.ilike(f'%{query}%')
+    ).limit(10).all()
+
+    # Search for posts (case-insensitive body match)
+    posts = Post.query.filter(
+        Post.body.ilike(f'%{query}%')
+    ).order_by(Post.timestamp.desc()).paginate(
+        page=page, per_page=app.config['POSTS_PER_PAGE'], error_out=False
+    )
+
+    next_url = url_for('search', q=query, page=posts.next_num) \
+        if posts.has_next else None
+    prev_url = url_for('search', q=query, page=posts.prev_num) \
+        if posts.has_prev else None
+
+    return render_template('search.html', title='Search', form=form,
+                         users=users, posts=posts.items, query=query,
+                         next_url=next_url, prev_url=prev_url)

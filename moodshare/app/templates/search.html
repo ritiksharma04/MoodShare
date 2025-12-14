@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{#
+    SEARCH RESULTS PAGE
+    ===================
+
+    This page shows:
+    1. Search input form (GET method - results in URL)
+    2. Matching users
+    3. Matching posts
+
+    URL PATTERN:
+    /search?q=hello&page=1
+
+    The query string (?q=hello) makes search results shareable/bookmarkable.
+#}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-warm-black dark:text-white mb-4">Search</h1>
+
+    {# Search form - uses GET method for bookmarkable URLs #}
+    <form action="{{ url_for('search') }}" method="GET" class="mb-6">
+        <div class="flex gap-2">
+            {{ form.q(
+                class_="flex-1 px-4 py-3 rounded-lg bg-gray-50 dark:bg-[#252525] border border-gray-200 dark:border-gray-700 text-warm-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all",
+                placeholder="Search users and posts..."
+            ) }}
+            <button type="submit"
+                    class="px-6 py-3 bg-warm-black dark:bg-white text-white dark:text-warm-black font-medium rounded-lg hover:opacity-90 transition-opacity">
+                Search
+            </button>
+        </div>
+    </form>
+</div>
+
+{% if query %}
+    {# Show search results #}
+    <p class="text-gray-500 dark:text-gray-400 mb-6">
+        Results for "<span class="text-warm-black dark:text-white font-medium">{{ query }}</span>"
+    </p>
+
+    {# Users section #}
+    {% if users %}
+    <div class="mb-8">
+        <h2 class="text-lg font-semibold text-warm-black dark:text-white mb-4">Users</h2>
+        <div class="bg-white dark:bg-[#252525] rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+            {% for user in users %}
+            <a href="{{ url_for('user', username=user.username) }}"
+               class="flex items-center gap-4 p-4 border-b border-gray-100 dark:border-gray-800 last:border-b-0 hover:bg-gray-50 dark:hover:bg-[#1f1f1f] transition-colors">
+                <img src="{{ user.avatar(48) }}"
+                     alt="{{ user.username }}'s avatar"
+                     class="w-12 h-12 rounded-full">
+                <div>
+                    <div class="font-semibold text-warm-black dark:text-white">{{ user.username }}</div>
+                    {% if user.about_me %}
+                        <div class="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">{{ user.about_me }}</div>
+                    {% endif %}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {# Posts section #}
+    {% if posts %}
+    <div>
+        <h2 class="text-lg font-semibold text-warm-black dark:text-white mb-4">Posts</h2>
+        <div class="bg-white dark:bg-[#252525] rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+            {% for post in posts %}
+                {% include '_post.html' %}
+            {% endfor %}
+        </div>
+
+        {# Pagination #}
+        {% if prev_url or next_url %}
+        <div class="flex justify-between items-center mt-6">
+            {% if prev_url %}
+                <a href="{{ prev_url }}"
+                   class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-[#252525] border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    Previous
+                </a>
+            {% else %}
+                <div></div>
+            {% endif %}
+
+            {% if next_url %}
+                <a href="{{ next_url }}"
+                   class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-[#252525] border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-[#2a2a2a] transition-colors">
+                    Next
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            {% else %}
+                <div></div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {# No results #}
+    {% if not users and not posts %}
+    <div class="bg-white dark:bg-[#252525] rounded-xl border border-gray-200 dark:border-gray-800 p-8 text-center">
+        <div class="text-gray-400 dark:text-gray-600 mb-4">
+            <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
+                </path>
+            </svg>
+        </div>
+        <h3 class="text-lg font-medium text-warm-black dark:text-white mb-2">No results found</h3>
+        <p class="text-gray-500 dark:text-gray-400">
+            Try searching for something else
+        </p>
+    </div>
+    {% endif %}
+
+{% else %}
+    {# Initial state - no search performed yet #}
+    <div class="bg-white dark:bg-[#252525] rounded-xl border border-gray-200 dark:border-gray-800 p-8 text-center">
+        <div class="text-gray-400 dark:text-gray-600 mb-4">
+            <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
+                </path>
+            </svg>
+        </div>
+        <h3 class="text-lg font-medium text-warm-black dark:text-white mb-2">Search MoodShare</h3>
+        <p class="text-gray-500 dark:text-gray-400">
+            Find users and posts
+        </p>
+    </div>
+{% endif %}
+{% endblock %}

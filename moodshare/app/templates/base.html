@@ -1,55 +1,257 @@
-{% extends 'bootstrap/base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+{#
+    BASE TEMPLATE - The Foundation
+    ==============================
 
-{% block title %}
-    {% if title %}{{ title }} - MoodShare{% else %}Welcome to MoodShare{% endif %}
-{% endblock %}
+    JINJA2 TEMPLATE INHERITANCE EXPLAINED:
+    --------------------------------------
+    Think of this like a blueprint. Other templates "extend" this one
+    and fill in the "blocks" (empty slots) with their content.
 
-{% block navbar %}
-    <nav class="navbar navbar-default">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="{{ url_for('index') }}">MoodShare</a>
-            </div>
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    <li><a href="{{ url_for('index') }}">Home</a></li>
-                    <li><a href="{{ url_for('explore') }}">Explore</a></li>
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
+    Flow:
+    1. User visits /login
+    2. Flask renders login.html
+    3. login.html extends base.html
+    4. login.html fills in {% block content %} with the login form
+    5. Final HTML sent to browser has: navbar + login form + footer
+
+    KEY JINJA2 SYNTAX:
+    - {% block name %}...{% endblock %} = Slot for child templates to fill
+    - {{ variable }} = Print a variable
+    - {% if condition %}...{% endif %} = Conditional
+    - {% for item in list %}...{% endfor %} = Loop
+    - {{ url_for('route_name') }} = Generate URL for a route
+#}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {# Page title - child templates can override this block #}
+    <title>{% block title %}{% if title %}{{ title }} - MoodShare{% else %}MoodShare{% endif %}{% endblock %}</title>
+
+    {# Google Fonts - Inter (the modern standard font) #}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    {#
+        TAILWIND CSS via CDN
+        --------------------
+        We're using the CDN for simplicity. In production, you'd install
+        Tailwind via npm and build a custom CSS file.
+
+        The CDN version includes ALL Tailwind classes, which is larger
+        but perfect for learning and development.
+    #}
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    {#
+        TAILWIND CONFIGURATION
+        ----------------------
+        This configures Tailwind to:
+        1. Enable dark mode via 'class' strategy (we add .dark to <html>)
+        2. Extend the default theme with our custom colors
+    #}
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        // Our Notion-inspired color palette
+                        'warm-black': '#37352f',
+                        'warm-gray': {
+                            50: '#f7f7f5',
+                            100: '#edece9',
+                            200: '#e6e6e4',
+                            300: '#d3d3d0',
+                            400: '#9b9b9b',
+                            500: '#6b6b6b',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    {# Our custom CSS with design system variables #}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    {# Additional head content from child templates #}
+    {% block head %}{% endblock %}
+</head>
+
+<body class="bg-white dark:bg-[#191919] text-warm-black dark:text-gray-200 min-h-screen">
+    {#
+        NAVIGATION BAR
+        --------------
+        Sticky navbar that stays at top when scrolling.
+        Uses flexbox for layout (flex, items-center, justify-between).
+
+        TAILWIND CLASS BREAKDOWN:
+        - sticky top-0: Sticks to top when scrolling
+        - z-50: High z-index to stay above other content
+        - bg-white/80: White background with 80% opacity
+        - backdrop-blur-md: Blur effect for glassmorphism
+        - border-b: Bottom border
+    #}
+    <nav class="sticky top-0 z-50 bg-white/80 dark:bg-[#191919]/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+        <div class="max-w-4xl mx-auto px-4">
+            <div class="flex items-center justify-between h-14">
+                {# Logo/Brand #}
+                <a href="{{ url_for('index') }}" class="text-xl font-bold text-warm-black dark:text-white hover:opacity-80 transition-opacity">
+                    MoodShare
+                </a>
+
+                {# Navigation Links #}
+                <div class="flex items-center gap-6">
+                    {# Main navigation links #}
+                    <a href="{{ url_for('index') }}"
+                       class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-warm-black dark:hover:text-white transition-colors">
+                        Home
+                    </a>
+                    <a href="{{ url_for('explore') }}"
+                       class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-warm-black dark:hover:text-white transition-colors">
+                        Explore
+                    </a>
+                    <a href="{{ url_for('search') }}"
+                       class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-warm-black dark:hover:text-white transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </a>
+
+                    {#
+                        CONDITIONAL RENDERING
+                        ---------------------
+                        current_user is provided by Flask-Login
+                        is_anonymous is True if not logged in
+                    #}
                     {% if current_user.is_anonymous %}
-                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                        <a href="{{ url_for('login') }}"
+                           class="text-sm font-medium px-4 py-2 rounded-lg bg-warm-black dark:bg-white text-white dark:text-warm-black hover:opacity-90 transition-opacity">
+                            Login
+                        </a>
                     {% else %}
-                    <li><a href="{{ url_for('user', username=current_user.username) }}">Profile</a></li>
-                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                        <a href="{{ url_for('user', username=current_user.username) }}"
+                           class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-warm-black dark:hover:text-white transition-colors">
+                            Profile
+                        </a>
+                        <a href="{{ url_for('logout') }}"
+                           class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-warm-black dark:hover:text-white transition-colors">
+                            Logout
+                        </a>
                     {% endif %}
-                </ul>
+
+                    {# Dark Mode Toggle Button #}
+                    <button id="theme-toggle"
+                            class="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            aria-label="Toggle dark mode">
+                        {# Sun icon (shown in dark mode) #}
+                        <svg id="sun-icon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                            </path>
+                        </svg>
+                        {# Moon icon (shown in light mode) #}
+                        <svg id="moon-icon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
-{% endblock %}
 
-{% block content %}
-    <div class="container">
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-info" role="alert">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-        {% endwith %}
+    {#
+        MAIN CONTENT AREA
+        -----------------
+        py-8: Padding top and bottom (2rem)
+        Child templates fill the 'content' block
+    #}
+    <main class="py-8">
+        <div class="max-w-2xl mx-auto px-4">
+            {#
+                FLASH MESSAGES
+                --------------
+                Flask's flash() function stores messages in session
+                get_flashed_messages() retrieves and clears them
 
-        {# application content needs to be provided in the app_content block #}
-        {% block app_content %}{% endblock %}
-    </div>
-{% endblock %}
+                This is how you show "Login successful!" type messages
+            #}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="mb-4 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
 
-{% block scripts %}
-    {{ super() }}
+            {# This is where child templates inject their content #}
+            {% block content %}{% endblock %}
+
+            {# Backwards compatibility with old templates using app_content #}
+            {% block app_content %}{% endblock %}
+        </div>
+    </main>
+
+    {#
+        FOOTER
+        ------
+        Simple, minimal footer
+    #}
+    <footer class="py-8 border-t border-gray-200 dark:border-gray-800">
+        <div class="max-w-2xl mx-auto px-4 text-center text-sm text-gray-500 dark:text-gray-500">
+            <p>&copy; 2024 MoodShare. Built with Flask.</p>
+        </div>
+    </footer>
+
+    {#
+        DARK MODE JAVASCRIPT
+        --------------------
+        This script handles:
+        1. Checking localStorage for saved preference
+        2. Toggling dark mode on button click
+        3. Saving preference to localStorage
+
+        LOCALSTORAGE EXPLAINED:
+        - Browser storage that persists across page reloads
+        - Key-value pairs: localStorage.setItem('key', 'value')
+        - Retrieve with: localStorage.getItem('key')
+    #}
+    <script>
+        // Check for saved preference or system preference
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+
+        // Toggle dark mode on button click
+        document.getElementById('theme-toggle').addEventListener('click', function() {
+            const html = document.documentElement;
+
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+    </script>
+
+    {# Flask-Moment for relative timestamps (e.g., "5 minutes ago") #}
     {{ moment.include_moment() }}
-{% endblock %}
+
+    {# Additional scripts from child templates #}
+    {% block scripts %}{% endblock %}
+</body>
+</html>

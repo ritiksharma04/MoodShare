@@ -1,11 +1,104 @@
-{% extends "base.html" %}
-{% import 'bootstrap/wtf.html' as wtf %}
+{% extends 'base.html' %}
+{#
+    REGISTRATION PAGE
+    =================
 
-{% block app_content %}
-    <h1>Register</h1>
-    <div class="row">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form) }}
+    Similar structure to login, but with more fields.
+    Notice the validation error handling - Flask-WTF automatically
+    validates based on the validators defined in forms.py
+#}
+
+{% block content %}
+<div class="min-h-[60vh] flex items-center justify-center py-8">
+    <div class="w-full max-w-sm">
+        <div class="bg-white dark:bg-[#252525] rounded-xl border border-gray-200 dark:border-gray-800 p-8 shadow-sm">
+            {# Header #}
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-warm-black dark:text-white mb-2">Create account</h1>
+                <p class="text-gray-500 dark:text-gray-400">Join MoodShare today</p>
+            </div>
+
+            <form method="POST" action="" class="space-y-5">
+                {{ form.hidden_tag() }}
+
+                {# Username #}
+                <div>
+                    <label for="username" class="block text-sm font-medium text-warm-black dark:text-gray-200 mb-2">
+                        Username
+                    </label>
+                    {{ form.username(
+                        class_="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-[#191919] border border-gray-200 dark:border-gray-700 text-warm-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all",
+                        placeholder="Choose a username"
+                    ) }}
+                    {% if form.username.errors %}
+                        {% for error in form.username.errors %}
+                            <p class="mt-1 text-sm text-red-500">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                {# Email #}
+                <div>
+                    <label for="email" class="block text-sm font-medium text-warm-black dark:text-gray-200 mb-2">
+                        Email
+                    </label>
+                    {{ form.email(
+                        class_="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-[#191919] border border-gray-200 dark:border-gray-700 text-warm-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all",
+                        placeholder="you@example.com"
+                    ) }}
+                    {% if form.email.errors %}
+                        {% for error in form.email.errors %}
+                            <p class="mt-1 text-sm text-red-500">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                {# Password #}
+                <div>
+                    <label for="password" class="block text-sm font-medium text-warm-black dark:text-gray-200 mb-2">
+                        Password
+                    </label>
+                    {{ form.password(
+                        class_="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-[#191919] border border-gray-200 dark:border-gray-700 text-warm-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all",
+                        placeholder="Create a password"
+                    ) }}
+                    {% if form.password.errors %}
+                        {% for error in form.password.errors %}
+                            <p class="mt-1 text-sm text-red-500">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                {# Confirm Password #}
+                <div>
+                    <label for="password2" class="block text-sm font-medium text-warm-black dark:text-gray-200 mb-2">
+                        Confirm Password
+                    </label>
+                    {{ form.password2(
+                        class_="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-[#191919] border border-gray-200 dark:border-gray-700 text-warm-black dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all",
+                        placeholder="Confirm your password"
+                    ) }}
+                    {% if form.password2.errors %}
+                        {% for error in form.password2.errors %}
+                            <p class="mt-1 text-sm text-red-500">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                {# Submit #}
+                <button type="submit"
+                        class="w-full py-3 px-4 bg-warm-black dark:bg-white text-white dark:text-warm-black font-medium rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 dark:focus:ring-white transition-all">
+                    Create Account
+                </button>
+            </form>
+
+            <p class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                Already have an account?
+                <a href="{{ url_for('login') }}" class="text-blue-500 hover:text-blue-600 font-medium transition-colors">
+                    Sign in
+                </a>
+            </p>
         </div>
     </div>
+</div>
 {% endblock %}
